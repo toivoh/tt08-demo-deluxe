@@ -497,7 +497,7 @@ module graphics_top #(
 
 `ifdef FPGA
 	wire [SECTION_BITS-1:0] section = frame_counter >> LOG2_SECTION_FRAMES; // four chord loops per section
-	//wire [SECTION_BITS-1:0] section = 4;
+	//wire [SECTION_BITS-1:0] section = 3;
 	//wire [SECTION_BITS-1:0] section = frame_counter[LOG2_SECTION_FRAMES] ? 4 : 3;
 	//wire [SECTION_BITS-1:0] section = frame_counter[LOG2_SECTION_FRAMES] ? 5 : 4;
 `else
@@ -507,19 +507,26 @@ module graphics_top #(
 	wire [1:0] subsect = frame_counter >> (LOG2_SECTION_FRAMES - 2); // one chord loop per subsect
 	wire [1:0] subsubsect = frame_counter >> (LOG2_SECTION_FRAMES - 4); // one chord per subsubsect
 	wire [1:0] sub3sect = frame_counter >> (LOG2_SECTION_FRAMES - 6);
+	wire [1:0] beat = frame_counter >> (LOG2_SECTION_FRAMES - 6);
+	wire halfbeat = frame_counter >> (LOG2_SECTION_FRAMES - 7);
 
 	//wire fade_in, force_forward, fm_on, sharp_sine, show_audio, jumps_on;
 	//wire fade_in=0, force_forward=0, fm_on=0, sharp_sine=0, show_audio=0, jumps_on=0;
 	//wire fade_in=0, force_forward=1, fm_on=0, sharp_sine=0, show_audio=0, jumps_on=1;
+
+	localparam LOGO_SRC_BITS = 2;
+
+	wire beat4 = beat[1:0] == 3;
 
 	// not registers
 	reg fade_in, logo_on, logo_fade_in, logo_fade_invert, force_forward, fm_on, sharp_sine, semi_sharp_sine, sharp_sine_init, visual_audio;
 	reg jumps_on, flip_min_t_compare, graphics_on;
 	reg [1:0] add_y;
 	reg [`PLAYER_CONTROL_BITS-1:0] p_control;
+	reg [LOGO_SRC_BITS-1:0] logo_src0, logo_src1;
 	always_comb begin
 		fade_in = 0; logo_on = 1; logo_fade_in = 0; logo_fade_invert = 0; force_forward = 0; fm_on = 0; sharp_sine = 0; semi_sharp_sine = 1; sharp_sine_init = 0;
-		visual_audio = 0; jumps_on = 0; flip_min_t_compare = 0; graphics_on = 1;
+		visual_audio = 0; jumps_on = 0; flip_min_t_compare = 0; graphics_on = 1; logo_src0 = 0; logo_src1 = 0;
 		add_y = 2'b10;
 		p_control[`PC_CHORDS_ON] = 1;
 		p_control[`PC_DETUNE_LEAD] = 0;
@@ -530,6 +537,7 @@ module graphics_top #(
 		p_control[`PC_SILENCE] = 0;
 		p_control[`PC_RAISE_BASS] = 0;
 		p_control[`PC_SQUARE_LEAD] = 0;
+		p_control[`PC_RAISE_DRUM] = 0;
 		case (section)
 			0: begin
 				fade_in = (subsect == 0);
@@ -545,6 +553,12 @@ module graphics_top #(
 					2: begin add_y = 2'b11; fm_on = 1; end
 					3: begin add_y = 2'b11; sharp_sine = 1; sharp_sine_init = 1; end
 				endcase
+				/*
+				p_control[`PC_RAISE_DRUM] = 1;
+				logo_src0 = subsect;
+				logo_src1 = subsect + beat4;
+				if (raise_drum && beat4 && halfbeat) logo_src0 = logo_src1;
+				*/
 			end
 			2: begin
 				p_control[`PC_CHORDS_ON] = 0;
@@ -571,6 +585,12 @@ module graphics_top #(
 				p_control[`PC_SQUARE_LEAD] = subsect[1] ^ (sub3sect == '1);
 				p_control[`PC_PRERESOLUTION] = (subsect == '1) && (subsubsect == '1);
 				jumps_on = 1;
+
+				p_control[`PC_RAISE_DRUM] = 1;
+				logo_src0 = subsect;
+				logo_src1 = subsect + beat4;
+				if (raise_drum && beat4 && halfbeat) logo_src0 = logo_src1;
+
 			end
 			5: begin
 				p_control[`PC_MODULATE] = 1;
@@ -689,8 +709,8 @@ module graphics_top #(
 	wire quick_logo_move = x[3];
 	wire [2:0] phase_shl_active = quick_logo_move ? 2 : 1;
 
-	wire bounce = 0;
-	//wire bounce = jumps_on && raise_drum;
+	//wire bounce = 0;
+	wire bounce = jumps_on && raise_drum;
 	//wire bounce = jumps_on && (raise_drum || subsect[1]);
 
 	wire bounce_en = bounce && (restart_counter == 6);
@@ -798,11 +818,14 @@ module graphics_top #(
 
 	//wire logo_part = x[3:0] > y_l[3:0];
 	//wire [4:0] logo_diff = y_l[3:0] - x[3:0];
-	wire [4:0] logo_diff = y_l[3:0] - xx[3:0] + logo_rot; // TODO: carry save adder?
-	wire logo_part = logo_diff[4];
+	//wire [4:0] logo_diff = y_l[3:0] - xx[3:0] + logo_rot; // TODO: carry save adder?
+	wire [5:0] logo_diff = y_l[3:0] - xx[3:0] + (logo_rot + 16); // TODO: carry save adder?
+	wire logo_part = !logo_diff[4];
 
 
-	wire [9:0] logo_addr = {logo_y, logo_x, logo_part};
+	wire [1:0] logo_src = logo_diff[5] ? logo_src1 : logo_src0;
+
+	wire [11:0] logo_addr = {logo_y, logo_src, logo_x, logo_part};
 	wire logo_out;
 	logo_table logo(
 		.addr(logo_addr), .data(logo_out)

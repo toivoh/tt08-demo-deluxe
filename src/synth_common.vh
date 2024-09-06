@@ -52,7 +52,7 @@
 `define MIN_OC_SHIFT 8
 `define CHORD_EXTRA_OSHIFT 3
 
-`define PLAYER_CONTROL_BITS 9
+`define PLAYER_CONTROL_BITS 10
 `define PC_CHORDS_ON     0
 `define PC_DETUNE_LEAD   1
 `define PC_SIMPLE_BASS   2
@@ -62,6 +62,7 @@
 `define PC_SILENCE       6
 `define PC_RAISE_BASS    7
 `define PC_SQUARE_LEAD   8
+`define PC_RAISE_DRUM    9
 
 `define EXT_CONTROL_BITS 7
 `define EC_VIS_BASS_OFF 0

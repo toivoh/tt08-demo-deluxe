@@ -463,7 +463,7 @@ module player #(parameter A_BITS=12, OCT_BITS=3, OSHIFT=5, TRACK_LOG2_WAIT=19, S
 		//note = 8'h10;
 		//note = 8'hfX;
 	end
-	assign raise_drum = (track_pos0 == 3) && second_loop;
+	assign raise_drum = (track_pos0 == 3) && (second_loop || control[`PC_RAISE_DRUM]);
 	//assign raise_drum = ((track_pos0 == 3) && second_loop) || (control[`PC_MODULATE] && lead_on0);
 
 
@@ -488,8 +488,11 @@ module player #(parameter A_BITS=12, OCT_BITS=3, OSHIFT=5, TRACK_LOG2_WAIT=19, S
 			endcase
 		end else if (track_pos0 != 3) begin
 			case (bass_track_pos)
+				//0, 2, 4, 5, 8, 12, 13: bass_note = bass_note1;
+				//1, 6, 10, 14: bass_note = bass_note2;
 				0, 2, 4, 5, 8, 12, 13: bass_note = bass_note1;
-				1, 6, 10, 14: bass_note = bass_note2;
+				1, 6, 10: bass_note = bass_note2;
+				14: bass_note = (track_pos0[0] != 1) ? bass_note2 : bass_note1;
 				default: bass_note = 8'hfX;
 			endcase
 		end else begin
