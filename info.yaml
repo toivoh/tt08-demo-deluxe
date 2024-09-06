@@ -1,9 +1,9 @@
 # Tiny Tapeout project information
 project:
-  title:        "Sequential Shadows [TT08 demo competition]"      # Project title
+  title:        "Sequential Shadows Deluxe [TT08 demo competition]"      # Project title
   author:       "Toivo Henningsson"      # Your name
   discord:      "possible_realities"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "My contribution to the TT08 demo competition"      # One line description of what your project does
+  description:  "My contribution to the TT08 demo competition, extended version"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     50400000       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -11,7 +11,7 @@ project:
   tiles: "2x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_toivoh_demo"
+  top_module:  "tt_um_toivoh_demo_deluxe"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.

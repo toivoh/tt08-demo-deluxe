@@ -23,7 +23,7 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
-  tt_um_toivoh_demo user_project (
+  tt_um_toivoh_demo_deluxe user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST

@@ -9,7 +9,7 @@
 `include "synth_common.vh"
 `include "common_generated.vh"
 
-module tt_um_toivoh_demo (
+module tt_um_toivoh_demo_deluxe (
 		input  wire [7:0] ui_in,    // Dedicated inputs
 		output wire [7:0] uo_out,   // Dedicated outputs
 		input  wire [7:0] uio_in,   // IOs: Input path
