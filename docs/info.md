@@ -16,7 +16,7 @@ Curly / Medieval presents
 my contribution to the Tiny Tapeout 8 demo competition.
 Code, graphics, and music by Curly (Toivo Henningsson) of Medieval.
 
-This is the deluxe version, with Pmod VGA RGB444 output support and a few changes from the original. It is not entered into the competition due to size.
+This is the deluxe version, with Pmod VGA RGB444 output support and a few changes from the original, in 2x2 tiles compared to the original's 1x2.
 
 ## How to test
 
@@ -42,6 +42,10 @@ Some of the inputs provide options on how the demo is run:
 	- The `t_` outputs are used when `pmod_vga_pinout` is low. This fits the TinyVGA Pmod pinout. (`p_` only outputs are not driven.)
 	- The `p_` outputs are used when `pmod_vga_pinout` is high. This fits the Pmod VGA pinout.
 - `logo_shadow_off`: When high, removes the logo's shadow (like in the non-deluxe version).
+
+If using A Pmod VGA as output, set `rgb444_mode` unless you want the original RGB222 experience.
+
+For the demo competition, set `pmod_vga_pinout` and `rgb444_mode` if you have a Pmod VGA, and please consider if you can still hook up the sound. Don't set any of the other inputs.
 
 ## External hardware
 
